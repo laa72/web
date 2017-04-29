@@ -63,6 +63,38 @@ class Facebook
         else
             return;
     }
+	    public static function toXML($data)
+    {
+        $arr = json_decode($data, true);
+        $xml = new SimpleXMLElement('<root/>');
+        //$arr = array_reverse($arr);
+        array_walk_recursive($arr, array($xml, 'addChild'));
+        return $xml->asXML();
+    }
+
+    static function ObjecttoJSON($object)
+    {
+        return json_encode($object, JSON_UNESCAPED_UNICODE);
+    }
+
+
+    static function JSONtoXML($json)
+    {
+        $xml = new SimpleXMLElement('<data/>');
+        Facebook::arrayToXml(json_decode($json, false), $xml);
+        return html_entity_decode($xml->asXML(), ENT_QUOTES, 'utf-8');
+    }
+
+    static function arrayToXml($array, &$xml)
+    {
+        foreach ($array as $key => $value) {
+            if (is_array($value) || is_object($value)) {
+                Facebook::arrayToXml($value, $xml->addChild($key));
+            } else {
+                $xml->addChild($key, htmlspecialchars($value));
+            }
+        }
+    }
 }
 
 ?>
